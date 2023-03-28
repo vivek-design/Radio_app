@@ -54,7 +54,69 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setupAlan() {
-    AlanVoice.addButton("55f0c45787863b3ed77d2cc156fa73652e956eca572e1d8b807a3e2338fdd0dc/stage", buttonAlign: AlanVoice.BUTTON_ALIGN_LEFT);
+    AlanVoice.addButton(
+        "55f0c45787863b3ed77d2cc156fa73652e956eca572e1d8b807a3e2338fdd0dc/stage",
+        buttonAlign: AlanVoice.BUTTON_ALIGN_LEFT);
+    AlanVoice.callbacks.add((command) => _handleCommand(command.data));
+  }
+
+  _handleCommand(Map<String, dynamic> response) {
+    switch (response["command"]) {
+      case "play":
+        _playMusic(_selectedRadio.url);
+        break;
+      case "play_channel":
+        print(response);
+        final id = response["id"];
+        _audioPlayer.pause();
+        print(id);
+        print(
+            "innnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnknknnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+        MyRadio newRadio;
+        newRadio = radios.firstWhere((element) => element.id == id);
+        print(newRadio);
+        radios.remove(newRadio);
+        radios.insert(0, newRadio);
+        _playMusic(newRadio.url);
+        break;
+      case "stop":
+        _audioPlayer.stop();
+        break;
+
+      case "next":
+        final index = _selectedRadio.id;
+        MyRadio newRadio;
+
+        if (index + 1 > radios.length) {
+          newRadio = radios.firstWhere((element) => element.id == 1);
+          radios.remove(newRadio);
+          radios.insert(0, newRadio);
+        } else {
+          newRadio = radios.firstWhere((element) => element.id == index + 1);
+          radios.remove(newRadio);
+          radios.insert(0, newRadio);
+        }
+        _playMusic(newRadio.url);
+        break;
+      case "prev":
+        final index = _selectedRadio.id;
+        MyRadio newRadio;
+
+        if (index - 1 <= 0) {
+          newRadio = radios.firstWhere((element) => element.id == 1);
+          radios.remove(newRadio);
+          radios.insert(0, newRadio);
+        } else {
+          newRadio = radios.firstWhere((element) => element.id == index - 1);
+          radios.remove(newRadio);
+          radios.insert(0, newRadio);
+        }
+        _playMusic(newRadio.url);
+
+        break;
+      default:
+        print("Command was ${response["comand"]}");
+    }
   }
 
   @override
