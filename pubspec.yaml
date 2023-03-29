@@ -33,14 +33,19 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
+  
   google_fonts: ^4.0.3
   velocity_x: ^3.6.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.12.0
   flutter_test:
     sdk: flutter
 
+
+flutter_icons:
+  image_path:"assets/4dfd9899da4e05707309101c75bf6611.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.

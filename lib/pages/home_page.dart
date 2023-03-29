@@ -19,12 +19,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Color _selectedColor = AIColors.primaryColor1;
+  Color _selectedColor = AIColors.primaryColor2;
   bool _isPlaying = false;
   late List<MyRadio> radios;
   late MyRadio _selectedRadio;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final sugg = [
+    "Play",
+    "Stop",
+    "Play rock music",
+    "Play 107 FM",
+    "Play 104 FM",
+    "Pause",
+    "Play previous",
+    "Play pop music",
+    "Play classic music"
+  ];
   @override
   void initState() {
     super.initState();
@@ -124,131 +135,177 @@ class _HomePageState extends State<HomePage> {
     Future.delayed(Duration(seconds: 1), () {
       setState(() {});
     });
-    return Scaffold(
-      drawer: Drawer(),
-      body: Stack(
-        children: [
-          VxAnimatedBox()
-              .size(context.screenWidth, context.screenHeight)
-              .withGradient(LinearGradient(
-                colors: [
-                  AIColors.primaryColor2,
-                  AIColors.primaryColor1,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ))
-              .make(),
-          AppBar(
-            title: "AI Radio".text.xl4.bold.white.make().shimmer(
-                primaryColor: Vx.purple300, secondaryColor: Colors.white),
-            backgroundColor: Colors.transparent,
-            elevation: 0.0,
-            centerTitle: true,
-          ).h(100.0).p16(),
-          // VxSwiper.builder(itemCount: radios.lenght, itemBuilder: itemBuilder)
-          radios != null
-              ? VxSwiper.builder(
-                  itemCount: radios.length,
-                  aspectRatio: 1.0,
-                  onPageChanged: (index) {
-                    var colhex = radios[index].color;
-                    _selectedColor = Color(int.parse(colhex));
-                  },
-                  enlargeCenterPage: true,
-                  itemBuilder: (context, index) {
-                    final rad = radios[index];
-                    return VxBox(
-                            child: ZStack(
-                      [
-                        Positioned(
-                          top: 0.0,
-                          right: 0.0,
-                          child: VxBox(
-                                  child: rad.category.text.uppercase.white
-                                      .make()
-                                      .px16())
-                              .height(40)
-                              .black
-                              .alignCenter
-                              .withRounded(value: 10.0)
-                              .make(),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: VStack(
-                            [
-                              rad.name.text.xl3.white.bold.make(),
-                              5.heightBox,
-                              rad.tagline.text.sm.white.semiBold.center.make(),
-                            ],
-                            crossAlignment: CrossAxisAlignment.center,
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: [
-                            Icon(
-                              CupertinoIcons.play_circle,
-                              color: Colors.white,
-                            ),
-                            10.heightBox,
-                            "Double tap to play".text.gray300.make(),
-                          ].vStack(),
-                        ),
+    return radios != null
+        ? Scaffold(
+            drawer: Drawer(
+              child: Container(
+                color: _selectedColor,
+                child: radios != null
+                    ? [
+                        100.heightBox,
+                        "All Channels".text.xl.white.semiBold.make().px16(),
+                        20.heightBox,
+                        ListView(
+                          padding: Vx.m0,
+                          shrinkWrap: true,
+                          children: radios
+                              .map((e) => ListTile(
+                                    leading: CircleAvatar(
+                                        backgroundImage: NetworkImage(e.icon)),
+                                    title: "${e.name} FM".text.white.make(),
+                                    subtitle: e.tagline.text.white.make(),
+                                  ))
+                              .toList(),
+                        ).expand(),
+                      ].vStack()
+                    : const Offstage(),
+              ),
+            ),
+            body: Stack(
+              children: [
+                VxAnimatedBox()
+                    .size(context.screenWidth, context.screenHeight)
+                    .withGradient(LinearGradient(
+                      colors: [
+                        AIColors.primaryColor2,
+                        AIColors.primaryColor1,
                       ],
-                      clip: Clip.antiAlias,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ))
-                        .clip(Clip.antiAlias)
-                        .bgImage(
-                          DecorationImage(
-                            image: NetworkImage(rad.image),
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                                Colors.black.withOpacity(0.3),
-                                BlendMode.darken),
-                          ),
-                        )
-                        .withRounded(value: 60)
-                        .border(color: Colors.black, width: 5.0)
-                        .make()
-                        .onDoubleTap(() {
-                      _playMusic(rad.url);
-                    }).p16();
-                  }).centered()
-              : Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.white,
-                  ),
-                ),
+                    .make(),
+                [
+                  AppBar(
+                    title: "AI Radio".text.xl4.bold.white.make().shimmer(
+                        primaryColor: Vx.purple300,
+                        secondaryColor: Colors.white),
+                    backgroundColor: Colors.transparent,
+                    elevation: 0.0,
+                    centerTitle: true,
+                  ).h(100.0).p16(),
+                  "Starts with 🤞 - Hey Alan".text.italic.semiBold.white.make(),
+                  15.heightBox,
+                  VxSwiper.builder(
+                      itemCount: sugg.length,
+                      height: 50.0,
+                      viewportFraction: 0.50,
+                      autoPlay: true,
+                      autoPlayAnimationDuration: 3.seconds,
+                      itemBuilder: (context, index) {
+                        final s = sugg[index];
+                        return Chip(label: s.text.make(),
+                        backgroundColor: Vx.randomColor,);
+                      })
+                ].vStack(),
+                // VxSwiper.builder(itemCount: radios.lenght, itemBuilder: itemBuilder)
+                radios != null
+                    ? VxSwiper.builder(
+                        itemCount: radios.length,
+                        aspectRatio: 1.0,
+                        onPageChanged: (index) {
+                          var colhex = radios[index].color;
+                          _selectedColor = Color(int.parse(colhex));
+                          setState(() {});
+                        },
+                        enlargeCenterPage: true,
+                        itemBuilder: (context, index) {
+                          final rad = radios[index];
+                          return VxBox(
+                                  child: ZStack(
+                            [
+                              Positioned(
+                                top: 0.0,
+                                right: 0.0,
+                                child: VxBox(
+                                        child: rad.category.text.uppercase.white
+                                            .make()
+                                            .px16())
+                                    .height(40)
+                                    .black
+                                    .alignCenter
+                                    .withRounded(value: 10.0)
+                                    .make(),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: VStack(
+                                  [
+                                    rad.name.text.xl3.white.bold.make(),
+                                    5.heightBox,
+                                    rad.tagline.text.sm.white.semiBold.center
+                                        .make(),
+                                  ],
+                                  crossAlignment: CrossAxisAlignment.center,
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.center,
+                                child: [
+                                  Icon(
+                                    CupertinoIcons.play_circle,
+                                    color: Colors.white,
+                                  ),
+                                  10.heightBox,
+                                  "Double tap to play".text.gray300.make(),
+                                ].vStack(),
+                              ),
+                            ],
+                            clip: Clip.antiAlias,
+                          ))
+                              .clip(Clip.antiAlias)
+                              .bgImage(
+                                DecorationImage(
+                                  image: NetworkImage(rad.image),
+                                  fit: BoxFit.cover,
+                                  colorFilter: ColorFilter.mode(
+                                      Colors.black.withOpacity(0.3),
+                                      BlendMode.darken),
+                                ),
+                              )
+                              .withRounded(value: 60)
+                              .border(color: Colors.black, width: 5.0)
+                              .make()
+                              .onDoubleTap(() {
+                            _playMusic(rad.url);
+                          }).p16();
+                        }).centered()
+                    : Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
 
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: [
-              if (_isPlaying)
-                "Playing Now - ${_selectedRadio.name} FM"
-                    .text
-                    .white
-                    .makeCentered(),
-              Icon(
-                _isPlaying
-                    ? CupertinoIcons.stop_circle
-                    : CupertinoIcons.play_circle,
-                color: Colors.white,
-                size: 50.0,
-              ).onInkTap(() {
-                if (_isPlaying) {
-                  _isPlaying = false;
-                  _audioPlayer.stop();
-                } else {
-                  _playMusic(_selectedRadio.url);
-                }
-              }),
-            ].vStack(),
-          ).pOnly(bottom: context.percentHeight * 12)
-        ],
-        fit: StackFit.expand,
-      ),
-    );
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: [
+                    if (_isPlaying)
+                      "Playing Now - ${_selectedRadio.name} FM"
+                          .text
+                          .white
+                          .makeCentered(),
+                    Icon(
+                      _isPlaying
+                          ? CupertinoIcons.stop_circle
+                          : CupertinoIcons.play_circle,
+                      color: Colors.white,
+                      size: 50.0,
+                    ).onInkTap(() {
+                      if (_isPlaying) {
+                        _isPlaying = false;
+                        _audioPlayer.stop();
+                      } else {
+                        _playMusic(_selectedRadio.url);
+                      }
+                    }),
+                  ].vStack(),
+                ).pOnly(bottom: context.percentHeight * 12)
+              ],
+              fit: StackFit.expand,
+            ),
+          )
+        : Container(
+          child: CircularProgressIndicator(),
+        
+        );
   }
 }
