@@ -1,0 +1,92 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+
+name: "Build and release"
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+     branches: ["main" , "master"]
+
+jobs:
+  build:
+     runs-on: macos-lates
+     steps:
+
+     
+# In a CI/CD (Continuous Integration/Continuous Deployment) 
+# workflow using GitHub Actions, "checking out the repository" 
+# refers to the process of fetching the source code of your project 
+# from the GitHub 
+# repository onto the runner environment where the workflow is 
+# being executed.
+        - name: Checkout Repository
+          uses: actions/checkout@v3
+
+        - name: Set up Java 
+          uses: actions/seteup-java@v3.12.0
+          with: 
+            distribution: 'oracle'
+            java-version: '17'
+
+        - name: Set Up Flutter
+          uses : subosito/flutter-action@v2
+          with : 
+            flutter-version: '3.13.2'
+            channel : 'stable'
+
+        - name : Install Dependecies
+          run : flutter pub get 
+
+
+        - name: Buidl apk 
+          run : flutter build apk --release
+
+        # In Flutter, flutter build appbundle is a command used to build 
+        # your Flutter app into an Android App Bundle (AAB)
+        # format. Here's why you might want to use flutter build 
+        # appbundle:
+
+
+        - name :  Build appBundle
+          run : flutter build appbundle 
+#In summary, building an IPA file is a critical step in
+ #iOS app development, as it's the format required for 
+ #app distribution, testing, ad hoc deployment, and 
+ #submission to the App Store. It encapsulates your
+ #app's binary and associated resources in a package
+ #that can be signed, distributed, and installed on
+ #iOS devices.
+
+        - name : Build IPA 
+          run : flutter build ipa --no-codesign
+        - name: Compress Archieves and IPAs
+          run : |
+            cd build 
+            tar -czf ios_build.tar.gz ios
+
+        - name: Upload Artifacts
+          uses: actions/upload-artifact@v2
+          with:
+           name: Releases
+           path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.abb
+            build/ios_build.tar.gz
+
+        - name : Create Release
+          uses: ncipollo/release-action@v1
+          with: 
+            artifacts: " build/app/outputs/flutter-apk/app-release.apk, build/app/outpusts/bundle/release/app-release.abb,build/ios_build.tar.gz "
+            tag: v1.0.${{github.run_number}}
+            token: ${{secrets.TOKEN}}
+
+       
+           
+           
+
+         
