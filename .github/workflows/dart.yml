@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-     runs-on: macos-lates
+     runs-on: macos-latest
      steps:
 
      
